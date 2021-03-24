@@ -44,8 +44,7 @@ public class Container {
         while (!todo.isEmpty()) {
             int initialSize = todo.size();
 
-            // lazy
-            Map<Class<?>, Object> createdObj = todo.stream() // lazy
+            Map<Class<?>, Object> createdObj = todo.stream()
                     .map(def -> def.getDeclaredConstructors()[0])
                     .filter(constructor -> constructor.getParameterCount() == 0 || allParameterInValues(constructor))
                     .map(this::instantiate)
@@ -90,13 +89,13 @@ public class Container {
                     .map(parameter -> Optional.ofNullable(objects.get(parameter.getType()))
                             .or(() -> Optional.ofNullable(values.get(
                                     // TODO: NPE
-                                    parameter.getAnnotation(Inject.class).value() // arg0
+                                    parameter.getAnnotation(Inject.class).value()
                             )))
                             .orElseThrow(() -> new UnmetDependenciesException(parameter.getName()))
                     ).toArray());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
-            throw new ObjectInstantiationException(e); // <- e //
+            throw new ObjectInstantiationException(e);
         }
     }
 
@@ -104,13 +103,11 @@ public class Container {
         HashSet<Parameter> parameters = new HashSet<>(Arrays.asList(constructor.getParameters()));
         parameters.removeIf(p -> objects.containsKey(p.getType()));
         // TODO: check parameter annotation -> throw exception
-        // Service
         parameters.removeAll(
                 parameters.stream()
                         .filter(p -> p.isAnnotationPresent(Inject.class))
                         .filter(p -> values.containsKey(p.getAnnotation(Inject.class).value()))
                         .collect(Collectors.toList())
-                // "smsUrl", "pushUrl"
         );
         return parameters.isEmpty();
     }
