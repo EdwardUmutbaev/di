@@ -8,6 +8,7 @@ import ru.edwum.di.exception.UnmetDependenciesException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,7 +44,8 @@ public class Container {
         while (!todo.isEmpty()) {
             int initialSize = todo.size();
 
-            final var createdObj = todo.stream() // lazy
+            // lazy
+            Map<Class<?>, Object> createdObj = todo.stream() // lazy
                     .map(def -> def.getDeclaredConstructors()[0])
                     .filter(constructor -> constructor.getParameterCount() == 0 || allParameterInValues(constructor))
                     .map(this::instantiate)
@@ -71,9 +73,9 @@ public class Container {
     private List<HashMap<Class<?>, Object>> getIfaces(Map<? extends Class<?>, Object> createdObj) {
         return createdObj.entrySet().stream()
                 .map(obj -> {
-                    final var interfaces = obj.getKey().getInterfaces();
-                    final var value = obj.getValue();
-                    final var ifaces = new HashMap<Class<?>, Object>();
+                    Class<?>[] interfaces = obj.getKey().getInterfaces();
+                    Object value = obj.getValue();
+                    HashMap<Class<?>, Object> ifaces = new HashMap<>();
                     for (Class<?> cls : interfaces) {
                         ifaces.put(cls, value);
                     }
@@ -99,7 +101,7 @@ public class Container {
     }
 
     private boolean allParameterInValues(Constructor<?> constructor) {
-        final var parameters = new HashSet<>(Arrays.asList(constructor.getParameters()));
+        HashSet<Parameter> parameters = new HashSet<>(Arrays.asList(constructor.getParameters()));
         parameters.removeIf(p -> objects.containsKey(p.getType()));
         // TODO: check parameter annotation -> throw exception
         // Service
