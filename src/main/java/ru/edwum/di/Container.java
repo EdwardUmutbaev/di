@@ -53,22 +53,12 @@ public class Container {
                     );
             objects.putAll(createdObj);
 
-            createdObj.entrySet().stream()
-                    .map(o -> {
-                        final var interfaces = o.getKey().getInterfaces();
-                        final var value = o.getValue();
-                        final var ifaces = new HashMap<Class<?>, Object>();
-                        for (Class<?> cls : interfaces) {
-                            ifaces.put(cls, value);
-                        }
-                        return ifaces;
-                    }).forEach(objects::putAll);
+            getIfaces(createdObj).forEach(objects::putAll);
 
             todo.removeAll(createdObj.keySet());
-
             int totalSize = todo.size();
 
-            if (createdObj.size() == 0 /*|| initialSize == totalSize*/) { //тут ли проверка на бесконечный?
+            if (createdObj.size() == 0 || initialSize == totalSize) {
                 // sad path
                 String unmet = todo.stream()
                         .map(Class::getName)
@@ -76,6 +66,19 @@ public class Container {
                 throw new UnmetDependenciesException(unmet);
             }
         }
+    }
+
+    private List<HashMap<Class<?>, Object>> getIfaces(Map<? extends Class<?>, Object> createdObj) {
+        return createdObj.entrySet().stream()
+                .map(obj -> {
+                    final var interfaces = obj.getKey().getInterfaces();
+                    final var value = obj.getValue();
+                    final var ifaces = new HashMap<Class<?>, Object>();
+                    for (Class<?> cls : interfaces) {
+                        ifaces.put(cls, value);
+                    }
+                    return ifaces;
+                }).collect(Collectors.toList());
     }
 
     private Object instantiate(Constructor<?> constructor) {
