@@ -39,7 +39,7 @@ public class Container {
     }
 
     public void wire() {
-        HashSet<Class<?>> todo = new HashSet<>(definitions);
+        Set<Class<?>> todo = new HashSet<>(definitions);
 
         while (!todo.isEmpty()) {
             int initialSize = todo.size();
