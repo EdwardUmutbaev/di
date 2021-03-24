@@ -1,6 +1,6 @@
 package ru.edwum.di.exception;
 
-public class AmbiguousValueNameException extends RuntimeException {
+public class AmbiguousValueNameException extends DIException {
     public AmbiguousValueNameException(String message) {
         super(message);
     }

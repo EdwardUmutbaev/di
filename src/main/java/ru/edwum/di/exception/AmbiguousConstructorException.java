@@ -1,6 +1,6 @@
 package ru.edwum.di.exception;
 
-public class AmbiguousConstructorException extends RuntimeException {
+public class AmbiguousConstructorException extends DIException {
     public AmbiguousConstructorException() {
         super();
     }
