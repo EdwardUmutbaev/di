@@ -46,7 +46,7 @@ public class Container {
 
             Map<Class<?>, Object> createdObj = todo.stream()
                     .map(def -> def.getDeclaredConstructors()[0])
-                    .filter(constructor -> constructor.getParameterCount() == 0 || allParameterInValues(constructor))
+                    .filter(constructor -> allParameterInValues(constructor) || constructor.getParameterCount() == 0 )
                     .map(this::instantiate)
                     .collect(Collectors.toMap(
                             Object::getClass,
