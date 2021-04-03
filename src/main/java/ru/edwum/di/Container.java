@@ -69,12 +69,12 @@ public class Container {
         }
     }
 
-    private List<HashMap<Class<?>, Object>> getIfaces(Map<? extends Class<?>, Object> createdObj) {
+    private List<Map<Class<?>, Object>> getIfaces(Map<? extends Class<?>, Object> createdObj) {
         return createdObj.entrySet().stream()
                 .map(obj -> {
                     Class<?>[] interfaces = obj.getKey().getInterfaces();
                     Object value = obj.getValue();
-                    HashMap<Class<?>, Object> ifaces = new HashMap<>();
+                    Map<Class<?>, Object> ifaces = new HashMap<>();
                     for (Class<?> cls : interfaces) {
                         ifaces.put(cls, value);
                     }
