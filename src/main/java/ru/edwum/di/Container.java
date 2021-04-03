@@ -86,11 +86,14 @@ public class Container {
         try {
             constructor.setAccessible(true);
             return constructor.newInstance(Arrays.stream(constructor.getParameters())
-                    .map(parameter -> Optional.ofNullable(objects.get(parameter.getType()))
-                            .or(() -> Optional.ofNullable(values.get(
-                                    // TODO: NPE
-                                    parameter.getAnnotation(Inject.class).value()
-                            )))
+                    .map(parameter ->
+                            Optional.ofNullable(objects.get(parameter.getType()))
+                            .or(() -> {
+                                Inject injectAnnotation = parameter.getAnnotation(Inject.class);
+                                if (injectAnnotation != null)
+                                    return Optional.ofNullable(values.get(injectAnnotation.value()));
+                                return Optional.empty();
+                            })
                             .orElseThrow(() -> new UnmetDependenciesException(parameter.getName()))
                     ).toArray());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
